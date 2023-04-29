@@ -1,0 +1,232 @@
+// const express = require('express');
+// const mongoose = require('mongoose');
+// const Notification = require('./models/Notification');
+// const cors = require('cors');
+// const subscribers = {};
+
+// mongoose.connect('mongodb://127.0.0.1:27017/osad_43')
+//   .then(() => {
+//     console.log('Connected to MongoDB');
+//   })
+//   .catch((err) => {
+//     console.error('Error connecting to MongoDB:', err.message);
+//     process.exit(1);
+//   });
+
+// const app = express();
+
+// app.use(cors());
+// app.use(express.json());
+
+// app.post('/notifications', async (req, res) => {
+//   try {
+//     const { body } = req;
+//     const notification = await Notification.create(body);
+//     res.status(201).json({ success: true, data: notification });
+//   } catch (err) {
+//     console.error('Error creating notification:', err.message);
+//     res.status(500).json({ success: false, error: err.message });
+//   }
+// });
+
+// app.get('/notifications', async (req, res) => {
+//   try {
+//     const notifications = await Notification.find().exec();
+//     res.status(201).json({ success: true, data: notifications });
+//   } catch (err) {
+//     console.error('Error getting notifications:', err.message);
+//     res.status(500).json({ success: false, error: err.message });
+//   }
+// });
+
+// app.get('/long/notifications/', async (req, res) => {
+//     const ID = Math.ceil(Math.random() * 1000000000);
+//     subscribers[ID] = res;
+//     res.on('close', () => {
+//         delete subscribers[ID];
+//     });
+// })
+
+// app.post('/long/notifications/', async (req, res) => {
+//     const { body } = req;
+//     Object.entries(subscribers).forEach(([key, value]) => {
+//         value.json({ success: true, data: body });
+//         delete subscribers[key];
+//     })
+//     res.status(201).json({ success: true, data: body });
+// });
+
+// const PORT = process.env.PORT || 5000;
+
+// app.listen(PORT, () => {
+//   console.log(`Server is listening on port ${PORT}`);
+// });
+
+
+// const express = require('express');
+// const mongoose = require('mongoose');
+// const Notification = require('./models/Notification');
+// const cors = require('cors');
+// const subscribers = {};
+
+// mongoose.connect('mongodb://127.0.0.1:27017/osad_43')
+//   .then(() => {
+//     console.log('Connected to MongoDB');
+//   })
+//   .catch((err) => {
+//     console.error('Error connecting to MongoDB:', err.message);
+//     process.exit(1);
+//   });
+
+// const app = express();
+
+// app.use(cors());
+// app.use(express.json());
+
+// app.post('/notifications', async (req, res) => {
+//   try {
+//     const { body } = req;
+//     const notification = await Notification.create(body);
+//     res.status(201).json({ success: true, data: notification });
+//   } catch (err) {
+//     console.error('Error creating notification:', err.message);
+//     res.status(500).json({ success: false, error: err.message });
+//   }
+// });
+
+// app.get('/notifications', async (req, res) => {
+//   try {
+//     const notifications = await Notification.find().exec();
+//     res.status(201).json({ success: true, data: notifications });
+//   } catch (err) {
+//     console.error('Error getting notifications:', err.message);
+//     res.status(500).json({ success: false, error: err.message });
+//   }
+// });
+
+// app.get('/long/notifications/', async (req, res) => {
+//   const ID = Math.ceil(Math.random() * 1000000000);
+//   const channel = req.query.channel;
+//   if (!subscribers[channel]) {
+//     subscribers[channel] = [];
+//   }
+//   subscribers[channel].push({ id: ID, res });
+//   res.on('close', () => {
+//     subscribers[channel] = subscribers[channel].filter((s) => s.id !== ID);
+//   });
+// });
+
+// app.post('/long/notifications/', async (req, res) => {
+//   const { body } = req;
+//   const channel = req.query.channel;
+//   if (subscribers[channel]) {
+//     subscribers[channel].forEach((s) => {
+//       s.res.json({ success: true, data: body });
+//     });
+//     subscribers[channel] = [];
+//   }
+//   res.status(201).json({ success: true, data: body });
+// });
+
+// const PORT = process.env.PORT || 5000;
+
+// app.listen(PORT, () => {
+//   console.log(`Server is listening on port ${PORT}`);
+// });
+
+
+// latest here for backup
+
+
+// const express = require('express');
+// const Notification = require('./models/Notification');
+// const cors = require('cors');
+// const connectDB = require('./config/db');
+// //subscriber is an object that contains all the subscribers
+// const subscribers = {};
+// // Keep track of the latest notification sent to each client
+// const latestNotificationSent = {};
+
+// // Connect to MongoDB
+// connectDB();
+
+// const app = express();
+
+// app.use(cors());
+// app.use(express.json());
+
+
+// app.post('/notifications', async (req, res) => {
+//   try {
+//     const { content } = req.body;
+//     const notification = await Notification.create({ content });
+
+//     // Update the latest notification sent timestamp for all subscribers of this channel
+//     const channel = body.channel;
+//     if (subscribers[channel]) {
+//       latestNotificationSent[channel] = notification.createdAt;
+//     }
+
+//     res.status(201).json({ success: true, data: notification });
+//   } catch (err) {
+//     console.error('Error creating notification:', err.message);
+//     res.status(500).json({ success: false, error: err.message });
+//   }
+// });
+
+// app.get('/notifications', async (req, res) => {
+//   try {
+//     const notifications = await Notification.find().exec();
+//     res.status(201).json({ success: true, data: notifications });
+//   } catch (err) {
+//     console.error('Error getting notifications:', err.message);
+//     res.status(500).json({ success: false, error: err.message });
+//   }
+// });
+
+// app.get('/long/notifications/', async (req, res) => {
+//   const ID = Math.ceil(Math.random() * 1000000000);
+//   const channel = req.query.channel;
+
+//   // Set the latest notification sent timestamp to the current time if it hasn't been set before
+//   if (!latestNotificationSent[channel]) {
+//     latestNotificationSent[channel] = new Date();
+//   }
+
+//   if (!subscribers[channel]) {
+//     subscribers[channel] = [];
+//   }
+
+//   // Only send notifications that were created after the latest notification sent to this client
+//   const latestTimestamp = latestNotificationSent[channel];
+//   const notifications = await Notification.find({ channel, createdAt: { $gt: latestTimestamp } }).exec();
+//   if (notifications.length > 0) {
+//     res.json({ success: true, data: notifications });
+//     latestNotificationSent[channel] = notifications[notifications.length - 1].createdAt;
+//   } else {
+//     subscribers[channel].push({ id: ID, res });
+//     res.on('close', () => {
+//       subscribers[channel] = subscribers[channel].filter((s) => s.id !== ID);
+//     });
+//   }
+// });
+
+// app.post('/long/notifications/', async (req, res) => {
+//   const { body } = req;
+//   const channel = req.query.channel;
+
+//   if (subscribers[channel]) {
+//     subscribers[channel].forEach((s) => {
+//       s.res.json({ success: true, data: body });
+//     });
+//     subscribers[channel] = [];
+//   }
+
+//   res.status(201).json({ success: true, data: body });
+// });
+
+// const PORT = process.env.PORT || 5000;
+
+// app.listen(PORT, () => {
+//   console.log(`Server is listening on port ${PORT}`);
+// });
